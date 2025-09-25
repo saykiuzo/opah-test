@@ -166,15 +166,20 @@ public class ConsolidadoController : ControllerBase
             };
 
             var arquivo = await _mediator.Send(query);
-            var nomeArquivo = $"consolidado_{data:yyyyMMdd}.xlsx";
+            var nomeArquivo = $"consolidado_{data:yyyy-MM-dd}.xlsx";
 
             var outputPath = Path.Combine("/app", "output");
             Directory.CreateDirectory(outputPath);
             
             var caminhoCompleto = Path.Combine(outputPath, nomeArquivo);
+            var caminhoRelativo = $"./output/{nomeArquivo}";
             await System.IO.File.WriteAllBytesAsync(caminhoCompleto, arquivo);
             
             _logger.LogInformation("Arquivo Excel salvo em: {Caminho}", caminhoCompleto);
+
+            Response.Headers["X-File-Location"] = caminhoRelativo;
+            Response.Headers["X-File-Status"] = "HTTP 200 - Arquivo Excel baixado na pasta atual";
+            Response.Headers["X-Server-Location"] = caminhoRelativo;
 
             return File(arquivo, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", nomeArquivo);
         }
@@ -204,15 +209,20 @@ public class ConsolidadoController : ControllerBase
             };
 
             var arquivo = await _mediator.Send(query);
-            var nomeArquivo = $"consolidado_{data:yyyyMMdd}.csv";
+            var nomeArquivo = $"consolidado_{data:yyyy-MM-dd}.csv";
 
             var outputPath = Path.Combine("/app", "output");
             Directory.CreateDirectory(outputPath);
             
             var caminhoCompleto = Path.Combine(outputPath, nomeArquivo);
+            var caminhoRelativo = $"./output/{nomeArquivo}";
             await System.IO.File.WriteAllBytesAsync(caminhoCompleto, arquivo);
             
             _logger.LogInformation("Arquivo CSV salvo em: {Caminho}", caminhoCompleto);
+
+            Response.Headers["X-File-Location"] = caminhoRelativo;
+            Response.Headers["X-File-Status"] = "HTTP 200 - Arquivo CSV baixado na pasta atual";
+            Response.Headers["X-Server-Location"] = caminhoRelativo;
 
             return File(arquivo, "text/csv", nomeArquivo);
         }

@@ -14,6 +14,11 @@ services:
     networks:
       - fluxocaixa-network
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   rabbitmq:
     image: rabbitmq:3.12-management
@@ -48,8 +53,10 @@ services:
     ports:
       - "5001:8080"
     depends_on:
-      - postgres
-      - rabbitmq
+      postgres:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
     networks:
       - fluxocaixa-network
     restart: unless-stopped
@@ -73,9 +80,12 @@ services:
     volumes:
       - ./output:/app/output
     depends_on:
-      - postgres
-      - rabbitmq
-      - lancamentos-api
+      postgres:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+      lancamentos-api:
+        condition: service_healthy
     networks:
       - fluxocaixa-network
     restart: unless-stopped
