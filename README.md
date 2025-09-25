@@ -351,7 +351,7 @@ output/                       # Relatórios gerados automaticamente
 
 Execute os testes com:
 ```bash
-make test-docker
+make test
 ```
 
 Os testes cobrem:
