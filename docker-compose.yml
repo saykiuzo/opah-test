@@ -1,0 +1,96 @@
+services:
+  postgres:
+    image: postgres:16
+    container_name: fluxocaixa-postgres
+    environment:
+      POSTGRES_DB: postgres
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./scripts/init-databases.sql:/docker-entrypoint-initdb.d/init-databases.sql
+    networks:
+      - fluxocaixa-network
+    restart: unless-stopped
+
+  rabbitmq:
+    image: rabbitmq:3.12-management
+    container_name: fluxocaixa-rabbitmq
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    ports:
+      - "5672:5672"    # AMQP port
+      - "15672:15672"  # Management UI
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    networks:
+      - fluxocaixa-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  lancamentos-api:
+    build:
+      context: .
+      dockerfile: src/Lancamentos/Lancamentos.API/Dockerfile
+    container_name: fluxocaixa-lancamentos-api
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Docker
+      - ConnectionStrings__DefaultConnection=Host=postgres;Database=fluxocaixa_lancamentos;Username=postgres;Password=postgres;Port=5432
+      - ConnectionStrings__RabbitMq=amqp://guest:guest@rabbitmq:5672
+      - UseInMemoryDemo=false
+    ports:
+      - "5001:8080"
+    depends_on:
+      - postgres
+      - rabbitmq
+    networks:
+      - fluxocaixa-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  consolidado-api:
+    build:
+      context: .
+      dockerfile: src/Consolidado/Consolidado.API/Dockerfile
+    container_name: fluxocaixa-consolidado-api
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Docker
+      - ConnectionStrings__DefaultConnection=Host=postgres;Database=fluxocaixa_consolidado;Username=postgres;Password=postgres;Port=5432
+      - ConnectionStrings__RabbitMq=amqp://guest:guest@rabbitmq:5672
+    ports:
+      - "5002:8080"
+    volumes:
+      - ./output:/app/output
+    depends_on:
+      - postgres
+      - rabbitmq
+      - lancamentos-api
+    networks:
+      - fluxocaixa-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+volumes:
+  postgres_data:
+    driver: local
+  rabbitmq_data:
+    driver: local
+
+networks:
+  fluxocaixa-network:
+    driver: bridge

@@ -1,0 +1,4 @@
+CREATE DATABASE fluxocaixa_lancamentos;
+CREATE DATABASE fluxocaixa_consolidado;
+CREATE DATABASE fluxocaixa_lancamentos_dev;
+CREATE DATABASE fluxocaixa_consolidado_dev;

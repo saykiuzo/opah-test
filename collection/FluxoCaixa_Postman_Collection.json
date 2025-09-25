@@ -1,0 +1,359 @@
+{
+	"info": {
+		"name": "FluxoCaixa API",
+		"description": "Sistema de Controle de Fluxo de Caixa - Testes Completos",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"variable": [
+		{
+			"key": "lancamentos_base_url",
+			"value": "http://localhost:5001"
+		},
+		{
+			"key": "consolidado_base_url",
+			"value": "http://localhost:5002"
+		}
+	],
+	"item": [
+		{
+			"name": "Health Checks",
+			"item": [
+				{
+					"name": "Lançamentos Health",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{lancamentos_base_url}}/health",
+							"host": ["{{lancamentos_base_url}}"],
+							"path": ["health"]
+						}
+					}
+				},
+				{
+					"name": "Consolidado Health",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{consolidado_base_url}}/health",
+							"host": ["{{consolidado_base_url}}"],
+							"path": ["health"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Lançamentos",
+			"item": [
+				{
+					"name": "Criar Lançamento - Crédito",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"data\": \"2024-09-24T10:00:00\",\n  \"valor\": 2000.00,\n  \"tipo\": 1,\n  \"descricao\": \"Recebimento de vendas\"\n}"
+						},
+						"url": {
+							"raw": "{{lancamentos_base_url}}/api/v1/lancamentos",
+							"host": ["{{lancamentos_base_url}}"],
+							"path": ["api", "v1", "lancamentos"]
+						}
+					}
+				},
+				{
+					"name": "Criar Lançamento - Débito",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"data\": \"2024-09-24T14:30:00\",\n  \"valor\": 500.00,\n  \"tipo\": 0,\n  \"descricao\": \"Pagamento de fornecedor\"\n}"
+						},
+						"url": {
+							"raw": "{{lancamentos_base_url}}/api/v1/lancamentos",
+							"host": ["{{lancamentos_base_url}}"],
+							"path": ["api", "v1", "lancamentos"]
+						}
+					}
+				},
+				{
+					"name": "Listar Todos os Lançamentos",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{lancamentos_base_url}}/api/v1/lancamentos",
+							"host": ["{{lancamentos_base_url}}"],
+							"path": ["api", "v1", "lancamentos"]
+						}
+					}
+				},
+				{
+					"name": "Obter Lançamento por ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{lancamentos_base_url}}/api/v1/lancamentos/{{lancamento_id}}",
+							"host": ["{{lancamentos_base_url}}"],
+							"path": ["api", "v1", "lancamentos", "{{lancamento_id}}"]
+						}
+					}
+				},
+				{
+					"name": "Atualizar Lançamento",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"data\": \"2024-09-24T15:00:00\",\n  \"valor\": 750.00,\n  \"tipo\": 0,\n  \"descricao\": \"Pagamento atualizado\"\n}"
+						},
+						"url": {
+							"raw": "{{lancamentos_base_url}}/api/v1/lancamentos/{{lancamento_id}}",
+							"host": ["{{lancamentos_base_url}}"],
+							"path": ["api", "v1", "lancamentos", "{{lancamento_id}}"]
+						}
+					}
+				},
+				{
+					"name": "Deletar Lançamento",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{lancamentos_base_url}}/api/v1/lancamentos/{{lancamento_id}}",
+							"host": ["{{lancamentos_base_url}}"],
+							"path": ["api", "v1", "lancamentos", "{{lancamento_id}}"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Consolidado",
+			"item": [
+				{
+					"name": "Consolidado Diário",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{consolidado_base_url}}/api/v1/consolidado/2024-09-24",
+							"host": ["{{consolidado_base_url}}"],
+							"path": ["api", "v1", "consolidado", "2024-09-24"]
+						}
+					}
+				},
+				{
+					"name": "Consolidados por Período",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{consolidado_base_url}}/api/v1/consolidado?dataInicio=2024-09-01&dataFim=2024-09-30",
+							"host": ["{{consolidado_base_url}}"],
+							"path": ["api", "v1", "consolidado"],
+							"query": [
+								{
+									"key": "dataInicio",
+									"value": "2024-09-01"
+								},
+								{
+									"key": "dataFim",
+									"value": "2024-09-30"
+								}
+							]
+						}
+					}
+				},
+				{
+					"name": "Relatório Excel",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{consolidado_base_url}}/api/v1/consolidado/relatorio/2024-09-24/excel",
+							"host": ["{{consolidado_base_url}}"],
+							"path": ["api", "v1", "consolidado", "relatorio", "2024-09-24", "excel"]
+						}
+					}
+				},
+				{
+					"name": "Relatório CSV",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{consolidado_base_url}}/api/v1/consolidado/relatorio/2024-09-24/csv",
+							"host": ["{{consolidado_base_url}}"],
+							"path": ["api", "v1", "consolidado", "relatorio", "2024-09-24", "csv"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Sequência de Teste Completa",
+			"item": [
+				{
+					"name": "1. Health Check Geral",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{lancamentos_base_url}}/health",
+							"host": ["{{lancamentos_base_url}}"],
+							"path": ["health"]
+						}
+					}
+				},
+				{
+					"name": "2. Criar Crédito Inicial",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 201) {",
+									"    var response = pm.response.json();",
+									"    pm.collectionVariables.set('credito1_id', response.id);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"data\": \"2024-09-24T09:00:00\",\n  \"valor\": 3000.00,\n  \"tipo\": 1,\n  \"descricao\": \"Recebimento inicial - Venda A\"\n}"
+						},
+						"url": {
+							"raw": "{{lancamentos_base_url}}/api/v1/lancamentos",
+							"host": ["{{lancamentos_base_url}}"],
+							"path": ["api", "v1", "lancamentos"]
+						}
+					}
+				},
+				{
+					"name": "3. Criar Débito",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 201) {",
+									"    var response = pm.response.json();",
+									"    pm.collectionVariables.set('debito1_id', response.id);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"data\": \"2024-09-24T11:00:00\",\n  \"valor\": 800.00,\n  \"tipo\": 0,\n  \"descricao\": \"Pagamento de fornecedor\"\n}"
+						},
+						"url": {
+							"raw": "{{lancamentos_base_url}}/api/v1/lancamentos",
+							"host": ["{{lancamentos_base_url}}"],
+							"path": ["api", "v1", "lancamentos"]
+						}
+					}
+				},
+				{
+					"name": "4. Criar Segundo Crédito",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"data\": \"2024-09-24T15:00:00\",\n  \"valor\": 1200.00,\n  \"tipo\": 1,\n  \"descricao\": \"Prestação de serviço\"\n}"
+						},
+						"url": {
+							"raw": "{{lancamentos_base_url}}/api/v1/lancamentos",
+							"host": ["{{lancamentos_base_url}}"],
+							"path": ["api", "v1", "lancamentos"]
+						}
+					}
+				},
+				{
+					"name": "5. Verificar Lista Completa",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{lancamentos_base_url}}/api/v1/lancamentos",
+							"host": ["{{lancamentos_base_url}}"],
+							"path": ["api", "v1", "lancamentos"]
+						}
+					}
+				},
+				{
+					"name": "6. Verificar Consolidado do Dia",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{consolidado_base_url}}/api/v1/consolidado/2024-09-24",
+							"host": ["{{consolidado_base_url}}"],
+							"path": ["api", "v1", "consolidado", "2024-09-24"]
+						}
+					}
+				},
+				{
+					"name": "7. Baixar Relatório Excel",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{consolidado_base_url}}/api/v1/consolidado/relatorio/2024-09-24/excel",
+							"host": ["{{consolidado_base_url}}"],
+							"path": ["api", "v1", "consolidado", "relatorio", "2024-09-24", "excel"]
+						}
+					}
+				}
+			]
+		}
+	]
+}
